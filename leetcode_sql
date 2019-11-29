@@ -1,11 +1,4 @@
-Leetcode_SQL
-
-175. Combine Two Tables
-
-SELECT FirstName, LastName, City, State
-FROM Person left join Address
-ON Person.PersonId = Address.PersonId;
-
+Leetcode_SQL: ORDER BY difficulty, frequency
 
 176. Second Highest Salary
 
@@ -16,6 +9,135 @@ SELECT
        ORDER BY Salary DESC
         LIMIT 1 OFFSET 1),
     NULL) AS SecondHighestSalary;
+
+
+175. Combine Two Tables
+
+SELECT FirstName, LastName, City, State
+FROM Person left join Address
+ON Person.PersonId = Address.PersonId;
+
+
+181. Employees Earning More Than Their Managers
+
+SELECT E1.Name AS Employee
+FROM Employee E1 LEFT JOIN Employee E2 ON E1.ManagerId = E2.Id
+WHERE E1.Salary > E2.Salary
+
+
+1179. Reformat Department Table
+
+select id, 
+	sum(case when month = 'jan' then revenue else null end) as Jan_Revenue,
+	sum(case when month = 'feb' then revenue else null end) as Feb_Revenue,
+	sum(case when month = 'mar' then revenue else null end) as Mar_Revenue,
+	sum(case when month = 'apr' then revenue else null end) as Apr_Revenue,
+	sum(case when month = 'may' then revenue else null end) as May_Revenue,
+	sum(case when month = 'jun' then revenue else null end) as Jun_Revenue,
+	sum(case when month = 'jul' then revenue else null end) as Jul_Revenue,
+	sum(case when month = 'aug' then revenue else null end) as Aug_Revenue,
+	sum(case when month = 'sep' then revenue else null end) as Sep_Revenue,
+	sum(case when month = 'oct' then revenue else null end) as Oct_Revenue,
+	sum(case when month = 'nov' then revenue else null end) as Nov_Revenue,
+	sum(case when month = 'dec' then revenue else null end) as Dec_Revenue
+from department
+group by id
+order by id
+## OR MAX(IF(month = 'jan', revenue, null))
+
+
+1084. Sales Analysis III
+
+
+
+182. Duplicate Emails
+
+SELECT DISTINCT A.Email as Email FROM
+(SELECT Email,
+COUNT(Email) OVER(PARTITION BY Email) AS num
+FROM Person) A
+WHERE A.num > 1;
+
+
+1113. Reported Posts
+
+SELECT extra AS report_reason, count(DISTINCT post_id) AS report_count
+FROM Actions
+WHERE action_date = '2019-07-04' AND action='report'
+GROUP BY extra;
+
+
+597. Friend Requests I: Overall Acceptance Rate
+
+
+
+
+196. Delete Duplicate Emails
+
+DELETE p1 FROM Person p1,
+    Person p2
+WHERE
+    p1.Email = p2.Email AND p1.Id > p2.Id
+
+# SELECT MIN(Id) AS Id, Email
+# FROM Person
+# GROUP BY Email;
+
+delete from 
+Person
+where  
+Id not in (select Id from 
+            (select min(Id) as Id 
+             from Person 
+             group by Email
+            ) p);
+
+
+1069. Product Sales Analysis II
+
+
+1068. Product Sales Analysis I
+
+
+197. Rising Temperature
+
+SELECT w1.Id as Id
+FROM Weather as w1, Weather as w2
+Where w1.Temperature > w2.Temperature AND w1.RecordDate = dateadd(day,1,w2.recorddate);
+
+
+1142. User Activity for the Past 30 Days II
+
+
+
+595. Big Countries
+
+SELECT name, population, area
+FROM World
+WHERE area > 3000000 OR Population > 25000000;
+
+
+183. Customers Who Never Order
+
+SELECT Name as Customers
+FROM Customers
+WHERE id not in (select CustomerId From Orders);
+
+
+627. Swap Salary
+
+UPDATE salary
+SET sex = CASE
+                WHEN sex = 'm' THEN 'f'
+                ELSE 'm'
+          END;
+
+
+610. Triangle Judgement
+
+select *, 
+IF(x > 0 AND y > 0 AND z >0 AND x + y > z AND x + z > y AND y + z > x, 'Yes', 'No') AS triangle 
+FROM triangle;
 
 
 177. Nth Highest Salary
@@ -45,51 +167,6 @@ DENSE_RANK() OVER(ORDER BY Score DESC) AS Rank
 From Scores;
 
 
-180. Consecutive Numbers
-
-
-181. Employees Earning More Than Their Managers
-
-
-182. Duplicate Emails
-
-SELECT DISTINCT A.Email as Email FROM
-(SELECT Email,
-COUNT(Email) OVER(PARTITION BY Email) AS num
-FROM Person) A
-WHERE A.num > 1;
-
-
-183. Customers Who Never Order
-
-SELECT Name as Customers
-FROM Customers
-WHERE id not in (select CustomerId From Orders);
-
-
-184. Department Highest Salary
-
-
-
-196. Delete Duplicate Emails
-
-DELETE p1 FROM Person p1,
-    Person p2
-WHERE
-    p1.Email = p2.Email AND p1.Id > p2.Id
-
-# SELECT MIN(Id) AS Id, Email
-# FROM Person
-# GROUP BY Email;
-
-delete from 
-Person
-where  
-Id not in (select Id from 
-            (select min(Id) as Id 
-             from Person 
-             group by Email
-            ) p);
 
 
 197. Rising Temperature
@@ -97,13 +174,6 @@ Id not in (select Id from
 SELECT w1.Id as Id
 FROM Weather as w1, Weather as w2
 Where w1.Temperature > w2.Temperature AND w1.RecordDate = dateadd(day,1,w2.recorddate);
-
-
-595. Big Countries
-
-SELECT name, population, area
-FROM World
-WHERE area > 3000000 OR Population > 25000000;
 
 
 596. Classes More Than 5 Students
@@ -120,17 +190,6 @@ SELECT *
 FROM cinema
 WHERE id%2 = 1 AND description NOT LIKE '%boring%'
 ORDER BY rating DESC;
-
-627. Swap Salary
-
-UPDATE salary
-SET sex = CASE
-                WHEN sex = 'm' THEN 'f'
-                ELSE 'm'
-          END;
-
-
-1179. Reformat Department Table
 
 
 

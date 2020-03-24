@@ -217,7 +217,7 @@ WHERE area >= ALL(SELECT area FROM world y
         		  WHERE y.continent=x.continent
          			 AND area>0);
 ```
-8. List each continent and the name of the country that comes first alphabetically. **
+8. List each continent and the name of the country that comes first alphabetically. **First country of each continent (alphabetically)**
 ```sql
 SELECT continent, name
 FROM world x
@@ -225,13 +225,22 @@ WHERE x.name <= ALL(SELECT name
 					FROM world y 
 					WHERE x.continent=y.continent);
 ```
-9. 
+9. Find the continents where all countries have a ```population <= 25000000```. Then find the names of the countries associated with these continents. Show name, continent and population.
 ```sql
-
+SELECT name, continent, population
+FROM world
+WHERE  continent IN (SELECT DISTINCT continent 
+					 FROM world 
+					 GROUP BY continent
+					 HAVING MAX(population) <= 25000000);
 ```
-10. 
+10. **(Hard)** Some countries have populations more than three times that of any of their neighbours (in the same continent). Give the countries and continents.
 ```sql
-
+SELECT x.name, x.continent
+FROM world x
+WHERE x.population/3 >  ALL(SELECT z.population 
+							FROM world z 
+							WHERE z.continent=x.continent XOR z.name = x.name);
 ```
 
 ### **SUM and COUNT**
@@ -264,14 +273,6 @@ WHERE x.name <= ALL(SELECT name
 
 ```
 8. 
-```sql
-
-```
-9. 
-```sql
-
-```
-10. 
 ```sql
 
 ```
@@ -317,6 +318,18 @@ WHERE x.name <= ALL(SELECT name
 ```sql
 
 ```
+11. 
+```sql
+
+```
+12. 
+```sql
+
+```
+13. 
+```sql
+
+```
 
 ### **More JOIN**
 1. 
@@ -356,6 +369,26 @@ WHERE x.name <= ALL(SELECT name
 
 ```
 10. 
+```sql
+
+```
+11. 
+```sql
+
+```
+12. 
+```sql
+
+```
+13. 
+```sql
+
+```
+14. 
+```sql
+
+```
+15. 
 ```sql
 
 ```

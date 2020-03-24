@@ -1,4 +1,4 @@
-# SQLZOO
+# SQLZOO: [link](https://sqlzoo.net)
 
 ### **SELECT basics**
 1. Modify it to show the population of Germany
@@ -6,7 +6,7 @@
 SELECT population FROM world
 WHERE name = 'Germany';
 ```
-2. Show the name and the population for 'Sweden', 'Norway' and 'Denmark'
+2. Show the ```name``` and the ```population``` for 'Sweden', 'Norway' and 'Denmark'
 ```sql
 SELECT name, population FROM world
 WHERE name IN ('Sweden', 'Norway', 'Denmark');
@@ -18,7 +18,7 @@ WHERE area BETWEEN 200000 AND 250000;
 ```
 
 ### **SELECT FROM world**
-1. show the name, continent and population of all countries.
+1. show the ```name```, ```continent``` and ```population``` of all countries.
 ```sql
 SELECT name, continent, population FROM world
 ```
@@ -33,13 +33,13 @@ SELECT name, gdp/population
 FROM world
 WHERE population >= 200000000;
 ```
-4. Show the name and population in millions for the countries of the continent 'South America'. Divide the population by 1000000 to get population in millions.
+4. Show the ```name``` and ```population``` in millions for the countries of the continent 'South America'. Divide the population by 1000000 to get population in millions.
 ```sql
 SELECT name, population/1000000
 FROM world
 WHERE continent = "South America";
 ```
-5. Show the name and population for France, Germany, Italy
+5. Show the ```name``` and ```population``` for France, Germany, Italy
 ```sql
 SELECT name, population
 FROM world
@@ -153,9 +153,299 @@ ORDER BY
  subject, winner;
 ```
 
-### SELECT in SELECT
+### **SELECT in SELECT**
+```
+world(name, continent, area, population, gdp)
+```
+1. List each country name where the population is larger than that of 'Russia'
+```sql
+SELECT name FROM world
+WHERE population >
+     (SELECT population FROM world
+      WHERE name='Russia');
+```
+2. Show the countries in Europe with a per capita GDP greater than 'United Kingdom'.
+```sql
+SELECT name
+FROM world
+WHERE continent='Europe' 
+	AND gdp/population > 
+        	(SELECT gdp/population 
+        	FROM world 
+        	WHERE name='United Kingdom');
+```
+3. List the ```name``` and ```continent``` of countries in the continents containing either Argentina or Australia. Order by ```name``` of the country.
+```sql
+SELECT name, continent 
+FROM world
+WHERE continent in (SELECT continent 
+					FROM world 
+					WHERE name='Argentina' OR name='Australia')
+ORDER BY name;
+```
+4. Which country has a population that is more than Canada but less than Poland? Show the ```name``` and the ```population```.
+```sql
+SELECT name, population 
+FROM world
+WHERE population > (SELECT population FROM world WHERE name='Canada')
+	AND population < (SELECT population FROM world WHERE name='Poland');
+```
+5. Germany (population 80 million) has the largest population of the countries in Europe. Austria (population 8.5 million) has 11% of the population of Germany.**Show the name and the population of each country in Europe. Show the population as a percentage of the population of Germany.**
+```sql
+SELECT name, concat(
+					round(
+						  population/(SELECT population 
+									  FROM world
+									  WHERE name='Germany')*100
+						  ,0)
+					,'%')
+FROM world
+WHERE continent='Europe';
+```
+6. Which countries have a GDP greater than every country in Europe? (Some countries may have NULL gdp values)
+```sql
+SELECT name
+FROM world
+WHERE gdp > ALL(SELECT gdp 
+				FROM world 
+				WHERE gdp>0 AND continent='Europe');
+```
+7. Find the largest country (by area) in each continent, show the continent, the name and the area.**The example is known as a correlated or synchronized sub-query.**
+```sql
+SELECT continent, name, area FROM world x
+WHERE area >= ALL(SELECT area FROM world y
+        		  WHERE y.continent=x.continent
+         			 AND area>0);
+```
+8. List each continent and the name of the country that comes first alphabetically. **
+```sql
+SELECT continent, name
+FROM world x
+WHERE x.name <= ALL(SELECT name 
+					FROM world y 
+					WHERE x.continent=y.continent);
+```
+9. 
+```sql
+
+```
+10. 
+```sql
+
+```
+
+### **SUM and COUNT**
+1. 
+```sql
+
+```
+2. 
+```sql
+
+```
+3. 
+```sql
+
+```
+4. 
+```sql
+
+```
+5. 
+```sql
+
+```
+6. 
+```sql
+
+```
+7. 
+```sql
+
+```
+8. 
+```sql
+
+```
+9. 
+```sql
+
+```
+10. 
+```sql
+
+```
+
+### **JOIN**
+1. 
+```sql
+
+```
+2. 
+```sql
+
+```
+3. 
+```sql
+
+```
+4. 
+```sql
+
+```
+5. 
+```sql
+
+```
+6. 
+```sql
+
+```
+7. 
+```sql
+
+```
+8. 
+```sql
+
+```
+9. 
+```sql
+
+```
+10. 
+```sql
+
+```
+
+### **More JOIN**
+1. 
+```sql
+
+```
+2. 
+```sql
+
+```
+3. 
+```sql
+
+```
+4. 
+```sql
+
+```
+5. 
+```sql
+
+```
+6. 
+```sql
+
+```
+7. 
+```sql
+
+```
+8. 
+```sql
+
+```
+9. 
+```sql
+
+```
+10. 
+```sql
+
+```
 
 
+### **Using NULL**
+1. 
+```sql
+
+```
+2. 
+```sql
+
+```
+3. 
+```sql
+
+```
+4. 
+```sql
+
+```
+5. 
+```sql
+
+```
+6. 
+```sql
+
+```
+7. 
+```sql
+
+```
+8. 
+```sql
+
+```
+9. 
+```sql
+
+```
+10. 
+```sql
+
+```
+
+
+
+### **Self JOIN**
+1. 
+```sql
+
+```
+2. 
+```sql
+
+```
+3. 
+```sql
+
+```
+4. 
+```sql
+
+```
+5. 
+```sql
+
+```
+6. 
+```sql
+
+```
+7. 
+```sql
+
+```
+8. 
+```sql
+
+```
+9. 
+```sql
+
+```
+10. 
+```sql
+
+```
 
 
 
@@ -163,7 +453,17 @@ ORDER BY
 **FUNCTIONS**
 1. ```ROUND(num,-3)``` means round to the nearest 1000
 2. ```LEFT(name,1)``` means the first letter of a word
+3. ```CONCAT('A','B')``` the output is 'AB'
 
 **NOTATION**
 1. ```<>``` means ```!=```
 2. ```'% %'``` means ```space```
+3. We can use the word ```ALL``` to allow ```>=``` or ```>``` or ```<``` or ```<=``` to act over a list. For example, you can find the largest country in the world, by population with this query:
+```sql
+SELECT name
+FROM world
+WHERE population >= ALL(SELECT population
+                        FROM world
+                        WHERE population>0)
+```
+

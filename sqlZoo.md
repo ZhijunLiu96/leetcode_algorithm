@@ -579,8 +579,8 @@ FROM teacher;
 
 ### **Self JOIN**
 ```
-stops( **id** , name)
-route( **num** , **company** , **pos** , stop)
+stops(id, name)
+route(num, company, pos, stop)
 ```
 1. How many stops are in the database.
 ```sql
@@ -757,6 +757,7 @@ CREATE TABLE games
 INSERT INTO games(yr,city) VALUES (2004,'Athens');
 ```
 **CREATE VIEW**
+
 In SQL, a view is a virtual table based on the result-set of an SQL statement, and not stored permanently.
 ```sql
 CREATE VIEW og AS
@@ -765,6 +766,7 @@ CREATE VIEW og AS
 SELECT * FROM og;
 ```
 **CREATE INDEX**
+
 index can make the join easier and faster
 ```sql
 CREATE INDEX gamesIdx ON games(city,yr);
@@ -784,11 +786,13 @@ INSERT INTO games(yr,city) SELECT yr+12, city FROM games;
 UPDATE games SET city='Paris' WHERE yr = 2012;
 ```
 **DELETE** 
+
 The DELETE statement can be used to remove rows from a table
 ```sql
 DELETE FROM games WHERE yr=2000;
 ```
 **ALTER**
+
 ```ALTER``` can be used to add a new column
 ```sql
 ALTER TABLE games ADD season VARCHAR(6);
@@ -811,6 +815,7 @@ DROP TABLE games
 ---
 
 **UNION**
+
 UNION selections from two tables
 ```sql
 SELECT name FROM bbc WHERE name LIKE 'Z%'
@@ -824,6 +829,7 @@ INTERSECT
 SELECT name FROM actor WHERE name LIKE 'Z%';
 ```
 **EXCEPT**
+
 IN bbc but NOT IN actor
 ```sql
 SELECT name FROM bbc WHERE name LIKE 'Z%'

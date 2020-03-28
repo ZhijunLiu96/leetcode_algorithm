@@ -59,7 +59,6 @@ class Solution:
                         paths.append(path+[n])
         return ans
 
-
 253. Meeting Rooms II
 class Solution:
     def minMeetingRooms(self, intervals: List[List[int]]) -> int:
@@ -614,7 +613,6 @@ class Solution:
                 return cal_sum(total)
         return cal_sum(n)
 
-
 557. Reverse Words in a String III
 class Solution:
     def reverseWords(self, s: str) -> str:
@@ -624,8 +622,6 @@ class Solution:
         for i in range(len(split)):
             split[i] = split[i][::-1]
         return ' '.join(split)
-
-
 
 78. Subsets """ three solutions """
 ## recursion (how to combine two list)
@@ -637,7 +633,6 @@ class Solution:
                 result += [result[j] + [nums[i]]]
         return result
 ## Backtracking
-
 
 222. Count Complete Tree Nodes
 # Definition for a binary tree node.
@@ -660,7 +655,6 @@ class Solution:
                 binarySearch(node.right)
         binarySearch(root)
         return self.count
-
 
 695. Max Area of Island
 class Solution:
@@ -1032,8 +1026,191 @@ class Solution:
         for word in words:
             for i in range(len(word)):
                 if word[:i]+word[i+1:] in diction:
-                    diction[word] = diction[word[:i]+word[i+1:]] + 1
+                    diction[word] = max(diction[word[:i]+word[i+1:]] + 1, diction[word])
                     result = max(result, diction[word])
         return result
 
+102. Binary Tree Level Order Traversal
+class Solution:
+    def levelOrder(self, root: TreeNode) -> List[List[int]]:
+        if not root:
+            return
+        result = [[root]]
+        while len(result[-1]) >0:
+            cur = []
+            for node in result[-1]:
+                if node.left:
+                    cur.append(node.left)
+                if node.right:
+                    cur.append(node.right)
+            result.append(cur)
+        result.pop()
+        for i in range(len(result)):
+            for j in range(len(result[i])):
+                result[i][j] = result[i][j].val
+        return result
+
+199. Binary Tree Right Side View
+class Solution:
+    def rightSideView(self, root: TreeNode) -> List[int]:
+        rightmost_value_at_depth = dict() # depth -> node.val
+        max_depth = -1
+        stack = [(root, 0)]
+        while stack:
+            node, depth = stack.pop()
+            if node is not None:
+                # maintain knowledge of the number of levels in the tree.
+                max_depth = max(max_depth, depth)
+                # only insert into dict if depth is not already present.
+                rightmost_value_at_depth.setdefault(depth, node.val)
+                stack.append((node.left, depth+1))
+                stack.append((node.right, depth+1))
+        return [rightmost_value_at_depth[depth] for depth in range(max_depth+1)]
+
+221. Maximal Square # padding
+class Solution:
+    def maximalSquare(self, matrix: List[List[str]]) -> int:
+        if not matrix:
+            return 0
+        m, n = len(matrix), len(matrix[0])
+        maximum = []
+        for i in range(m):
+            for j in range(n):
+                matrix[i][j] = int(matrix[i][j])
+            matrix[i].insert(0,0)
+            matrix[i].append(0)
+        matrix.insert(0,[0]*(n+2))
+        matrix.append([0]*(n+2))
+        for i in range(1,m+1):
+            for j in range(1,n+1):
+                if matrix[i][j]==1:
+                    matrix[i][j] = min(matrix[i-1][j],matrix[i-1][j-1],matrix[i][j-1])+1
+            maximum.append(max(matrix[i]))
+        return max(maximum)**2
+
+122. Best Time to Buy and Sell Stock II
+class Solution:
+    def maxProfit(self, prices: List[int]) -> int:
+        res = 0
+        for i in range(1,len(prices)):
+            if prices[i]-prices[i-1]>0:
+                res += prices[i]-prices[i-1]
+        return res
+
+146. LRU Cache
+class DLinkedNode:
+    def __init__(self):
+        self.key = 0
+        self.value = 0
+        self.prev = None
+        self.next = None
+class LRUCache:
+        
+    def _add_node(self, node):
+        """Always add the new node right after head"""
+        node.prev = self.head
+        node.next = self.head.next
+        
+        self.head.next.prev = node
+        self.head.next = node
+        
+    def _remove_node(self, node):
+        """
+        Remove an existing node from the linked list.
+        """
+        prev = node.prev
+        new = node.next
+        
+        prev.next = new
+        new.prev = prev
+        
+    def _move_to_head(self, node):
+        """
+        Move certain node in between to the head.
+        """
+        self._remove_node(node)
+        self._add_node(node)
+
+    def _pop_tail(self):
+        """
+        Pop the current tail.
+        """
+        res = self.tail.prev
+        self._remove_node(res)
+        return res
+
+    def __init__(self, capacity):
+        """
+        :type capacity: int
+        """
+        self.cache = {}
+        self.size = 0
+        self.capacity = capacity
+        self.head, self.tail = DLinkedNode(), DLinkedNode()
+
+        self.head.next = self.tail
+        self.tail.prev = self.head
+        
+
+    def get(self, key):
+        """
+        :type key: int
+        :rtype: int
+        """
+        node = self.cache.get(key, None)
+        if not node:
+            return -1
+        # move the accessed node to the head;
+        self._move_to_head(node)
+
+        return node.value
+
+    def put(self, key, value):
+        """
+        :type key: int
+        :type value: int
+        :rtype: void
+        """
+        node = self.cache.get(key)
+
+        if not node: 
+            newNode = DLinkedNode()
+            newNode.key = key
+            newNode.value = value
+            self.cache[key] = newNode
+            self._add_node(newNode)
+            self.size += 1
+            if self.size > self.capacity:
+                # pop the tail
+                tail = self._pop_tail()
+                del self.cache[tail.key]
+                self.size -= 1
+        else:
+            # update the value.
+            node.value = value
+            self._move_to_head(node)
+
+1192. Critical Connections in a Network
+from collections import defaultdict
+class Solution:
+    def criticalConnections(self, n: int, connections: List[List[int]]) -> List[List[int]]:
+        g = defaultdict(list)
+        for a, b in connections:
+            g[a].append(b)
+            g[b].append(a)
+        low = [0] * n
+        def dfs(rank, cur, parent):
+            low[cur] = rank
+            ans = []
+            for child in g[cur]:
+                if child == parent: continue
+                if low[child] == 0:
+                    ans += dfs(rank + 1, child, cur)
+                low[cur] = min(low[cur], low[child])
+                
+                if low[child] > rank:
+                    ans.append([child, cur])
+            return ans
+            
+        return dfs(1, 0, -1)
 

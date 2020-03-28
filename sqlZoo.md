@@ -1,5 +1,6 @@
 # SQLZOO: [link](https://sqlzoo.net)
 
+
 ### **SELECT basics**
 1. Modify it to show the population of Germany
 ```sql
@@ -16,6 +17,7 @@ WHERE name IN ('Sweden', 'Norway', 'Denmark');
 SELECT name, area FROM world
 WHERE area BETWEEN 200000 AND 250000;
 ```
+
 
 ### **SELECT FROM world**
 1. show the ```name```, ```continent``` and ```population``` of all countries.
@@ -57,6 +59,7 @@ SELECT name, population, area
 FROM world
 WHERE area > 3000000 OR population > 250000000
 ```
+
 
 ### **SELECT FROM nobel**
 ```
@@ -153,6 +156,7 @@ ORDER BY
  subject, winner;
 ```
 
+
 ### **SELECT in SELECT**
 ```
 world(name, continent, area, population, gdp)
@@ -242,243 +246,434 @@ WHERE x.population/3 >  ALL(SELECT z.population
 	WHERE z.continent=x.continent XOR z.name = x.name);
 ```
 
+
 ### **SUM and COUNT**
-1. 
-```sql
-
 ```
-2. 
-```sql
-
+world(name, continent, area, population, gdp)
 ```
-3. 
+1. Show the total population of the world.
 ```sql
-
+SELECT SUM(population)
+FROM world;
 ```
-4. 
+2. List all the continents - just once each.
 ```sql
-
+SELECT DISTINCT continent
+FROM world;
 ```
-5. 
+3. Give the total GDP of Africa
 ```sql
-
+SELECT SUM(gdp)
+FROM world
+WHERE continent="Africa";
 ```
-6. 
+4. How many countries have an area of at least 1000000
 ```sql
-
+SELECT COUNT(DISTINCT name)
+FROM world
+WHERE area >= 1000000;
 ```
-7. 
+5. What is the total population of ('Estonia', 'Latvia', 'Lithuania')
 ```sql
-
+SELECT SUM(population)
+FROM world
+WHERE name IN ('Estonia', 'Latvia', 'Lithuania');
 ```
-8. 
+6. For each continent show the continent and number of countries.
 ```sql
-
+SELECT continent, COUNT(DISTINCT name)
+FROM world
+GROUP BY continent;
 ```
+7. For each continent show the continent and number of countries with populations of at least 10 million.
+```sql
+SELECT x.continent, COUNT(x.name)
+FROM (SELECT DISTINCT name, continent
+	FROM world
+	WHERE population >= 10000000) x
+GROUP BY continent;
+```
+8. List the continents that have a total population of at least 100 million.
+```sql
+SELECT continent
+FROM world
+GROUP BY continent 
+HAVING SUM(population) >= 100000000;
+```
+
 
 ### **JOIN**
-1. 
-```sql
-
 ```
-2. 
-```sql
-
+game(id, mdate, stadium, team1, team2)
+goal(matchid, teamid, player, gtime)
+eteam(id, teamname, coach)
 ```
-3. 
+1. Show the matchid and player name for all goals scored by Germany. To identify German players, check for: ```teamid = 'GER'```.
 ```sql
-
+SELECT matchid, player FROM goal 
+WHERE teamid = 'GER';
 ```
-4. 
+2. Show id, stadium, team1, team2 for just game 1012
 ```sql
-
+SELECT id,stadium,team1,team2
+FROM game
+WHERE id=1012;
 ```
-5. 
+3. Show the player, teamid, stadium and mdate for every German goal.
 ```sql
-
+SELECT player, teamid, stadium, mdate
+FROM game JOIN goal ON (id=matchid)
+WHERE teamid = "GER";
 ```
-6. 
+4. Show the team1, team2 and player for every goal scored by a player called ```Mario player LIKE 'Mario%'```
 ```sql
-
+SELECT team1, team2, player
+FROM game JOIN goal ON (id=matchid)
+WHERE player LIKE 'Mario%';
 ```
-7. 
+5. Show ```player```, ```teamid```, ```coach```, ```gtime``` for all goals scored in the first 10 minutes ```gtime<=10```
 ```sql
-
+SELECT player, teamid, coach, gtime
+FROM goal JOIN eteam ON (teamid=id)
+WHERE gtime<=10;
 ```
-8. 
+6. List the the dates of the matches and the name of the team in which 'Fernando Santos' was the team1 coach.
 ```sql
-
+SELECT mdate, teamname
+FROM game JOIN eteam ON (team1 = eteam.id)
+WHERE coach='Fernando Santos';
 ```
-9. 
+7. List the player for every goal scored in a game where the stadium was 'National Stadium, Warsaw'
 ```sql
-
+SELECT player
+FROM goal JOIN game ON (matchid=id)
+WHERE stadium="National Stadium, Warsaw";
 ```
-10. 
+8. Show the name of all players who scored a goal against Germany. You can use ```teamid!='GER'``` to prevent listing German players. You can use ```DISTINCT``` to stop players being listed twice.
 ```sql
-
+SELECT DISTINCT player
+FROM game JOIN goal ON matchid = id 
+WHERE (team1='GER' OR team2='GER') AND teamid!='GER';
 ```
-11. 
+9. Show teamname and the total number of goals scored.
 ```sql
-
+SELECT teamname, COUNT(*)
+FROM goal JOIN eteam ON goal.teamid=eteam.id
+GROUP BY teamname;
 ```
-12. 
+10. Show the stadium and the number of goals scored in each stadium.
 ```sql
-
+SELECT stadium, COUNT(*)
+FROM game JOIN goal ON (matchid=id)
+GROUP BY stadium;
 ```
-13. 
+11. For every match involving 'POL', show the matchid, date and the number of goals scored.
 ```sql
-
+SELECT matchid,mdate, COUNT(matchid)
+FROM game JOIN goal ON matchid = id 
+WHERE (team1 = 'POL' OR team2 = 'POL')
+GROUP BY matchid;
 ```
+12. For every match where 'GER' scored, show matchid, match date and the number of goals scored by 'GER'
+```sql
+SELECT matchid, mdate, count(matchid)
+FROM game JOIN goal ON (matchid = id)
+WHERE teamid = "GER"
+GROUP BY matchid; 
+```
+13. **(Hard)**List every match with the goals scored by each team as shown. This will use "CASE WHEN" which has not been explained in any previous exercises.
+```sql
+SELECT mdate,
+team1,
+SUM(CASE WHEN teamid=team1 THEN 1 ELSE 0 END) score1,
+team2,
+SUM(CASE WHEN teamid=team2 THEN 1 ELSE 0 END) score2
+FROM game LEFT JOIN goal ON matchid = id
+GROUP BY game.id
+ORDER BY game.mdate, goal.matchid, game.team1, game.team2;
+```
+
 
 ### **More JOIN**
-1. 
-```sql
-
 ```
-2. 
-```sql
-
+movie(id, title, yr, director, budget, gross)
+actor(id, name)
+casting(movieid, actorid, ord)
 ```
-3. 
+1. List the films where the ```yr``` is 1962 (Show ```id```, ```title```)
 ```sql
-
+SELECT id, title
+FROM movie
+WHERE yr=1962;
 ```
-4. 
+2. Give year of 'Citizen Kane'
 ```sql
-
+SELECT yr
+FROM movie
+WHERE title='Citizen Kane';
 ```
-5. 
+3. List all of the Star Trek movies, include the ```id```, ```title``` and ```yr``` (all of these movies include the words Star Trek in the title). Order results by year.
 ```sql
-
+SELECT id, title, yr
+FROM movie
+WHERE title LIKE "%Star Trek%"
+ORDER BY yr;
 ```
-6. 
+4. What id number does the actor 'Glenn Close' have?
 ```sql
-
+SELECT id 
+FROM actor
+WHERE name="Glenn Close";
 ```
-7. 
+5. What is the id of the film 'Casablanca'
 ```sql
-
+SELECT id
+FROM movie
+WHERE title="Casablanca";
 ```
-8. 
+6. Obtain the cast list for 'Casablanca'. Use ```movieid=11768```, (or whatever value you got from the previous question)
 ```sql
-
+SELECT name
+FROM movie 
+JOIN casting ON movie.id=casting.movieid
+JOIN actor ON actor.id=casting.actorid
+WHERE movieid=11768;
 ```
-9. 
+7. Obtain the cast list for the film 'Alien'
 ```sql
-
+SELECT name
+FROM movie 
+JOIN casting ON movie.id=casting.movieid
+JOIN actor ON actor.id=casting.actorid
+WHERE movie.title='Alien';
 ```
-10. 
+8. List the films in which 'Harrison Ford' has appeared
 ```sql
-
+SELECT title
+FROM movie 
+JOIN casting ON movie.id=casting.movieid
+JOIN actor ON actor.id=casting.actorid
+WHERE actor.name='Harrison Ford';
 ```
-11. 
+9. List the films where 'Harrison Ford' has appeared - but not in the starring role. (Note: the ord field of casting gives the position of the actor. If ```ord=1``` then this actor is in the starring role)
 ```sql
-
+SELECT title
+FROM movie 
+JOIN casting ON movie.id=casting.movieid
+JOIN actor ON actor.id=casting.actorid
+WHERE actor.name='Harrison Ford' AND casting.ord!=1;
 ```
-12. 
+10. List the films together with the leading star for all 1962 films.
 ```sql
-
+SELECT title, actor.name
+FROM movie 
+	JOIN casting ON movie.id=casting.movieid
+	JOIN actor ON actor.id=casting.actorid
+WHERE casting.ord=1 AND movie.yr=1962;
 ```
-13. 
+11. Which were the busiest years for 'Rock Hudson', show the year and the number of movies he made each year for any year in which he made more than 2 movies.
 ```sql
-
+SELECT yr, COUNT(title) 
+FROM movie 
+	JOIN casting ON movie.id=movieid
+	JOIN actor   ON actorid=actor.id
+WHERE name='Rock Hudson'
+GROUP BY yr
+HAVING COUNT(title) > 2;
 ```
-14. 
+12. List the film title and the leading actor for all of the films 'Julie Andrews' played in.
 ```sql
-
+SELECT title, name 
+FROM movie 
+	JOIN casting ON movie.id=movieid 
+	JOIN actor ON actorid=actor.id
+WHERE ord=1 
+	AND movieid IN (SELECT movieid FROM casting WHERE actorid IN 
+			(SELECT id FROM actor WHERE name='Julie Andrews'));
 ```
-15. 
+13. Obtain a list, in alphabetical order, of actors who've had at least 15 starring roles.
 ```sql
-
+SELECT actor.name 
+FROM movie 
+	JOIN casting ON movie.id=movieid 
+	JOIN actor ON actorid=actor.id
+WHERE ord=1
+GROUP BY actor.name
+HAVING COUNT(actor.name)>=15
+ORDER BY actor.name;
+```
+14. List the films released in the year 1978 ordered by the number of actors in the cast, then by title.
+```sql
+SELECT title, COUNT(actorid) FROM movie JOIN casting ON movie.id=movieid JOIN actor ON actorid=actor.id
+WHERE yr=1978
+GROUP BY title
+ORDER BY COUNT(actorid) DESC, title
+```
+15. List all the people who have worked with 'Art Garfunkel'.
+```sql
+SELECT actor.name 
+FROM movie 
+	JOIN casting ON movie.id=movieid 
+	JOIN actor ON actorid=actor.id
+WHERE movieid IN (SELECT movieid FROM casting JOIN actor ON actorid=actor.id WHERE actor.name='Art Garfunkel') AND actor.name <> 'Art Garfunkel';
 ```
 
 
 ### **Using NULL**
-1. 
-```sql
-
 ```
-2. 
-```sql
-
+teacher(id, dept, name, phone, mobile)
+dept(id, name)
 ```
-3. 
+1. List the teachers who have NULL for their department.
 ```sql
-
+SELECT name
+FROM teacher
+WHERE dept IS NULL;
 ```
-4. 
+2. Note the INNER JOIN misses the teachers with no department and the departments with no teacher.
 ```sql
-
+SELECT teacher.name, dept.name
+FROM teacher INNER JOIN dept
+	ON (teacher.dept=dept.id);
 ```
-5. 
+3. Use a different JOIN so that all teachers are listed.
 ```sql
-
+SELECT teacher.name, dept.name
+FROM teacher LEFT JOIN dept
+	ON (teacher.dept=dept.id);
 ```
-6. 
+4. Use a different JOIN so that all departments are listed.
 ```sql
-
+SELECT teacher.name, dept.name
+FROM teacher RIGHT JOIN dept
+	ON (teacher.dept=dept.id);
 ```
-7. 
+5. Use ```COALESCE``` to print the mobile number. Use the number '07986 444 2266' if there is no number given. **Show teacher name and mobile number or '07986 444 2266'**
 ```sql
-
+SELECT name, COALESCE(mobile, '07986 444 2266')
+FROM teacher;
 ```
-8. 
+6. Use the ```COALESCE``` function and a ```LEFT JOIN``` to print the teacher name and department name. Use the string 'None' where there is no department.
 ```sql
-
+SELECT teacher.name, COALESCE(dept.name,'None')
+FROM teacher LEFT JOIN dept ON teacher.dept=dept.id;
 ```
-9. 
+7. Use ```COUNT``` to show the number of teachers and the number of mobile phones.
 ```sql
-
+SELECT COUNT(name), COUNT(mobile)
+FROM teachher;
 ```
-10. 
+8. Use ```COUNT``` and ```GROUP BY dept.name``` to show each department and the number of staff. Use a ```RIGHT JOIN``` to ensure that the Engineering department is listed.
 ```sql
-
+SELECT dept.name, COUNT(teacher.name)
+FROM teacher RIGHT JOIN dept ON teacher.dept=dept.id
+GROUP BY dept.name;
 ```
-
+9. Use ```CASE``` to show the name of each teacher followed by 'Sci' if the teacher is in dept 1 or 2 and 'Art' otherwise.
+```sql
+SELECT name, CASE WHEN dept=1 or dept=2 THEN 'Sci' ELSE 'Art' END
+FROM teacher;
+```
+10. Use ```CASE``` to show the name of each teacher followed by 'Sci' if the teacher is in dept 1 or 2, show 'Art' if the teacher's dept is 3 and 'None' otherwise.
+```sql
+SELECT name, 
+	CASE WHEN dept=1 or dept=2 THEN 'Sci' 
+		WHEN dept=3 THEN 'Art' 
+		ELSE 'None' END
+FROM teacher;
+```
 
 
 ### **Self JOIN**
-1. 
-```sql
-
 ```
-2. 
-```sql
-
+stops(**id**, name)
+route(**num**, **company**, **pos**, stop)
 ```
-3. 
+1. How many stops are in the database.
 ```sql
-
+SELECT COUNT(*)
+FROM stops;
 ```
-4. 
+2. Find the ```id``` value for the stop 'Craiglockhart'
 ```sql
-
+SELECT id
+FROM stops
+WHERE name="Craiglockhart";
 ```
-5. 
+3. Give the ```id``` and the ```name``` for the ```stops``` on the '4' 'LRT' service.
 ```sql
-
+SELECT DISTINCT stops.id, stops.name
+FROM stops RIGHT JOIN route ON stops.id=route.stop
+WHERE num='4' AND company='LRT';
 ```
-6. 
+4. The query shown gives the number of routes that visit either London Road (149) or Craiglockhart (53). Run the query and notice the two services that link these stops have a count of 2. Add a ```HAVING``` clause to restrict the output to these two routes.
 ```sql
-
+SELECT company, num, COUNT(*)
+FROM route WHERE stop=149 OR stop=53
+GROUP BY company, num
+HAVING COUNT(*)=2;
 ```
-7. 
+5. Execute the self join shown and observe that b.stop gives all the places you can get to from Craiglockhart, without changing routes. Change the query so that it shows the services from Craiglockhart to London Road.
 ```sql
-
+SELECT a.company, a.num, a.stop, b.stop
+FROM route a 
+  JOIN route b ON (a.company=b.company AND a.num=b.num)
+WHERE a.stop=53 AND b.stop=149;
 ```
-8. 
+6. The query shown is similar to the previous one, however by joining two copies of the stops table we can refer to stops by name rather than by number. Change the query so that the services between 'Craiglockhart' and 'London Road' are shown. If you are tired of these places try 'Fairmilehead' against 'Tollcross'
 ```sql
-
+SELECT a.company, a.num, stopa.name, stopb.name
+FROM route a JOIN route b ON
+  (a.company=b.company AND a.num=b.num)
+  JOIN stops stopa ON (a.stop=stopa.id)
+  JOIN stops stopb ON (b.stop=stopb.id)
+WHERE stopa.name='Craiglockhart' AND stopb.name='London Road';
 ```
-9. 
+7. Give a list of all the services which connect stops 115 and 137 ('Haymarket' and 'Leith')
 ```sql
-
+SELECT DISTINCT a.company, a.num
+FROM route a JOIN route b ON
+  (a.company=b.company AND a.num=b.num)
+WHERE a.stop=115 AND b.stop=137
 ```
-10. 
+8. Give a list of the services which connect the stops 'Craiglockhart' and 'Tollcross'
 ```sql
-
+SELECT DISTINCT a.company, a.num
+FROM route a JOIN route b ON
+  (a.company=b.company AND a.num=b.num)
+  JOIN stops stopa ON (a.stop=stopa.id)
+  JOIN stops stopb ON (b.stop=stopb.id)
+WHERE stopa.name='Craiglockhart' AND stopb.name='Tollcross';
 ```
+9. Give a distinct list of the stops which may be reached from 'Craiglockhart' by taking one bus, including 'Craiglockhart' itself, offered by the LRT company. Include the company and bus no. of the relevant services.
+```sql
+SELECT DISTINCT stopb.name, a.company, a.num
+FROM route a JOIN route b ON
+  (a.company=b.company AND a.num=b.num)
+  JOIN stops stopa ON (a.stop=stopa.id)
+  JOIN stops stopb ON (b.stop=stopb.id)
+WHERE stopa.name = 'Craiglockhart' AND a.company='LRT';
+```
+10. Find the routes involving two buses that can go from Craiglockhart to Lochend. Show the bus No. and company for the first bus, the name of the stop for the transfer, and the bus no. and company for the second bus.
+```sql
+SELECT DISTINCT bus1.num, bus1.company, bus1.name, bus2.num, bus2.company
+FROM
+ (SELECT a.num, a.company, sb.name
+  FROM route a JOIN route b ON (a.company=b.company AND a.num=b.num)
+  JOIN stops sa ON (sa.id = a.stop)
+  JOIN stops sb ON (sb.id = b.stop)
+ WHERE sa.name='Craiglockhart' AND sb.name NOT IN ('Craiglockhart','Lochend')) bus1
+JOIN
+ (SELECT a.num, a.company, sa.name
+  FROM route a JOIN route b ON (a.company=b.company AND a.num=b.num)
+  JOIN stops sa ON (sa.id = a.stop)
+  JOIN stops sb ON (sb.id = b.stop)
+ WHERE sb.name='Lochend' AND sa.name NOT IN ('Craiglockhart','Lochend')) bus2
+ON (bus1.name=bus2.name) 
+```
+**Incorrect, but the answer seems right**
 
+**Why self join?**
 
 
 ### Some useful tips
@@ -486,11 +681,7 @@ WHERE x.population/3 >  ALL(SELECT z.population
 1. ```ROUND(num,-3)``` means round to the nearest 1000
 2. ```LEFT(name,1)``` means the first letter of a word
 3. ```CONCAT('A','B')``` the output is 'AB'
-
-**NOTATION**
-1. ```<>``` means ```!=```
-2. ```'% %'``` means ```space```
-3. We can use the word ```ALL``` to allow ```>=``` or ```>``` or ```<``` or ```<=``` to act over a list. For example, you can find the largest country in the world, by population with this query:
+4. We can use the word ```ALL``` to allow ```>=``` or ```>``` or ```<``` or ```<=``` to act over a list. For example, you can find the largest country in the world, by population with this query:
 ```sql
 SELECT name
 FROM world
@@ -498,4 +689,35 @@ WHERE population >= ALL(SELECT population
                         FROM world
                         WHERE population>0)
 ```
+5. Different ```JOIN```
+- ```INNER JOIN``` = ```JOIN```: only return the matchable records
+- ```LEFT JOIN```: return records in the left table
+- ```RIGHT JOIN```: return records in the right table
+- ```FULL JOIN```: return all records in both tables
+6. ```COALESCE``` takes any number of arguments and returns the first value that is not null.
+```
+COALESCE(x,y,z) = x if x is not NULL
+COALESCE(x,y,z) = y if x is NULL and y is not NULL
+COALESCE(x,y,z) = z if x and y are NULL but z is not NULL
+COALESCE(x,y,z) = NULL if x and y and z are all NULL
+```
+
+**NOTATION**
+1. ```<>``` means ```!=```
+2. ```'% %'``` means space
+3. ```ORDER BY 2``` means order by the second field in the selection
+```sql
+SELECT name, COUNT(movieid)
+FROM casting JOIN actor ON actorid=actor.id
+WHERE name LIKE 'John %'
+GROUP BY name ORDER BY 2 DESC
+```
+
+### SOME OTHER USEFUL TOOLS
+
+**DELETE, DROP, UPDATE, ALTER, INSERT**
+
+**CREATE VIEW, TABLE**
+
+**WINDOW FUNCTION**
 

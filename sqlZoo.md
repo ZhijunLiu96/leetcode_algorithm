@@ -1,5 +1,6 @@
 # SQLZOO: [link](https://sqlzoo.net)
 
+---
 
 ### **SELECT basics**
 1. Modify it to show the population of Germany
@@ -17,7 +18,6 @@ WHERE name IN ('Sweden', 'Norway', 'Denmark');
 SELECT name, area FROM world
 WHERE area BETWEEN 200000 AND 250000;
 ```
-
 
 ### **SELECT FROM world**
 1. show the ```name```, ```continent``` and ```population``` of all countries.
@@ -59,7 +59,6 @@ SELECT name, population, area
 FROM world
 WHERE area > 3000000 OR population > 250000000
 ```
-
 
 ### **SELECT FROM nobel**
 ```
@@ -156,7 +155,6 @@ ORDER BY
  subject, winner;
 ```
 
-
 ### **SELECT in SELECT**
 ```
 world(name, continent, area, population, gdp)
@@ -246,7 +244,6 @@ WHERE x.population/3 >  ALL(SELECT z.population
 	WHERE z.continent=x.continent XOR z.name = x.name);
 ```
 
-
 ### **SUM and COUNT**
 ```
 world(name, continent, area, population, gdp)
@@ -300,7 +297,6 @@ FROM world
 GROUP BY continent 
 HAVING SUM(population) >= 100000000;
 ```
-
 
 ### **JOIN**
 ```
@@ -381,7 +377,7 @@ FROM game JOIN goal ON (matchid = id)
 WHERE teamid = "GER"
 GROUP BY matchid; 
 ```
-13. **(Hard)**List every match with the goals scored by each team as shown. This will use "CASE WHEN" which has not been explained in any previous exercises.
+13. **(Hard)** List every match with the goals scored by each team as shown. This will use "CASE WHEN" which has not been explained in any previous exercises.
 ```sql
 SELECT mdate,
 team1,
@@ -392,7 +388,6 @@ FROM game LEFT JOIN goal ON matchid = id
 GROUP BY game.id
 ORDER BY game.mdate, goal.matchid, game.team1, game.team2;
 ```
-
 
 ### **More JOIN**
 ```
@@ -518,7 +513,6 @@ FROM movie
 WHERE movieid IN (SELECT movieid FROM casting JOIN actor ON actorid=actor.id WHERE actor.name='Art Garfunkel') AND actor.name <> 'Art Garfunkel';
 ```
 
-
 ### **Using NULL**
 ```
 teacher(id, dept, name, phone, mobile)
@@ -583,11 +577,10 @@ SELECT name,
 FROM teacher;
 ```
 
-
 ### **Self JOIN**
 ```
-stops(**id**, name)
-route(**num**, **company**, **pos**, stop)
+stops( **id** , name)
+route( **num** , **company** , **pos** , stop)
 ```
 1. How many stops are in the database.
 ```sql
@@ -668,16 +661,18 @@ JOIN
   FROM route a JOIN route b ON (a.company=b.company AND a.num=b.num)
   JOIN stops sa ON (sa.id = a.stop)
   JOIN stops sb ON (sb.id = b.stop)
- WHERE sb.name='Lochend' AND sa.name NOT IN ('Craiglockhart','Lochend')) bus2
+WHERE sb.name='Lochend' AND sa.name NOT IN ('Craiglockhart','Lochend')) bus2
 ON (bus1.name=bus2.name) 
 ```
 **Incorrect, but the answer seems right**
 
 **Why self join?**
+- correlate rows in a table
 
+---
 
-### Some useful tips
-**FUNCTIONS**
+### SOME USEFUL FUNCTIONS
+
 1. ```ROUND(num,-3)``` means round to the nearest 1000
 2. ```LEFT(name,1)``` means the first letter of a word
 3. ```CONCAT('A','B')``` the output is 'AB'
@@ -701,8 +696,45 @@ COALESCE(x,y,z) = y if x is NULL and y is not NULL
 COALESCE(x,y,z) = z if x and y are NULL but z is not NULL
 COALESCE(x,y,z) = NULL if x and y and z are all NULL
 ```
+```IFNULL(variable, 0)``` is equal to ```COALESCE(variable, 0)```
+7. ```SUBSTRING```
+```sql
+SUBSTRING(string, start, length)
+SUBSTRING(string FROM start FOR length)
+```
+8. ```CONCAT```: concatenate strings
+Combination of multiple variables and strings
+```sql
+SELECT CONCAT(name, ' is in ', region)
+FROM bbc;
+```
+9. ```LOWER()``` and ```UPPER```
+10. ```POSITION()```: can be used to find a substring
+```sql
+SELECT name,
+       POSITION(' ' IN name),
+       SUBSTRING(name FROM 1 FOR POSITION(' ' IN name))
+FROM bbc
+WHERE name LIKE '% %';
+```
+11. Conditioanl Value: ```CASE WHEN THEN ELSE END``` is equal to ```IF(condition, then, else)```
+```sql
+SELECT title, score,
+   CASE WHEN score>8.5 THEN 'Excellent' ELSE 'OK' END
+FROM movie;
+```
+```sql
+SELECT title, score, IF(score>8.5,'Excellent','OK')
+FROM movie
+```
+12. other useful function list: [link](https://sqlzoo.net/wiki/FUNCTIONS)
 
-**NOTATION**
+13. **WINDOW FUNCTION**
+[Link](https://mode.com/sql-tutorial/sql-window-functions/)
+
+---
+
+### SOME USEFUL NOTATIONS
 1. ```<>``` means ```!=```
 2. ```'% %'``` means space
 3. ```ORDER BY 2``` means order by the second field in the selection
@@ -713,11 +745,88 @@ WHERE name LIKE 'John %'
 GROUP BY name ORDER BY 2 DESC
 ```
 
-### SOME OTHER USEFUL TOOLS
+---
 
-**DELETE, DROP, UPDATE, ALTER, INSERT**
+### SOME OTHER USEFUL OPERATIONS
 
-**CREATE VIEW, TABLE**
+**CREATE TABLE**
+```sql
+CREATE TABLE games
+	(yr   INT NOT NULL PRIMARY KEY
+	,city VARCHAR(20));
+INSERT INTO games(yr,city) VALUES (2004,'Athens');
+```
+**CREATE VIEW**
+In SQL, a view is a virtual table based on the result-set of an SQL statement, and not stored permanently.
+```sql
+CREATE VIEW og AS
+	SELECT yr,city FROM games
+	WHERE yr<2006;
+SELECT * FROM og;
+```
+**CREATE INDEX**
+index can make the join easier and faster
+```sql
+CREATE INDEX gamesIdx ON games(city,yr);
+SELECT * FROM games;
+```
 
-**WINDOW FUNCTION**
+---
 
+**INSERT**
+```sql
+INSERT INTO games(yr, city) VALUES (2012,'London');
+
+INSERT INTO games(yr,city) SELECT yr+12, city FROM games;
+```
+**UPDATE**
+```sql
+UPDATE games SET city='Paris' WHERE yr = 2012;
+```
+**DELETE** 
+The DELETE statement can be used to remove rows from a table
+```sql
+DELETE FROM games WHERE yr=2000;
+```
+**ALTER**
+```ALTER``` can be used to add a new column
+```sql
+ALTER TABLE games ADD season VARCHAR(6);
+UPDATE games SET season = 'summer'
+  WHERE yr = 2004;
+UPDATE games SET season = 'winter'
+  WHERE yr = 2006;
+```
+Or drop column
+```sql
+ALTER TABLE dbo.doc_exb DROP COLUMN column_b;
+```
+**DROP**
+```sql
+DROP VIEW old_games;
+DROP INDEX gamesIdx ON games;
+DROP TABLE games
+```
+
+---
+
+**UNION**
+UNION selections from two tables
+```sql
+SELECT name FROM bbc WHERE name LIKE 'Z%'
+UNION
+SELECT name FROM actor WHERE name LIKE 'Z%';
+```
+**INTERSECT**
+```sql
+SELECT name FROM bbc WHERE name LIKE 'Z%'
+INTERSECT
+SELECT name FROM actor WHERE name LIKE 'Z%';
+```
+**EXCEPT**
+IN bbc but NOT IN actor
+```sql
+SELECT name FROM bbc WHERE name LIKE 'Z%'
+EXCEPT
+SELECT name FROM actor WHERE name LIKE 'Z%';
+```

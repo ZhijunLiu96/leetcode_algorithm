@@ -696,7 +696,7 @@ COALESCE(x,y,z) = y if x is NULL and y is not NULL
 COALESCE(x,y,z) = z if x and y are NULL but z is not NULL
 COALESCE(x,y,z) = NULL if x and y and z are all NULL
 ```
-```IFNULL(variable, 0)``` is equal to ```COALESCE(variable, 0)```
+```IFNULL(variable, 0)``` is equal to ```COALESCE(variable, 0)``` <br/>
 7. ```SUBSTRING```
 ```sql
 SUBSTRING(string, start, length)

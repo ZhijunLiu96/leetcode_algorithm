@@ -1,5 +1,6 @@
 
-1. Ones Groups <br/>
+1. Ones Groups
+
 In a square gird, two cells are connected if they share an edge and share the same value. Sharing an edge is up, down, left and right, but not diagonal. Given a square grid, determine the number of cells in each connected group of 1 values. There will be an array of queries, each one an integer. Create a return array of integer where each element is the number of groups in the matrix that have a size that matches the query.
 
 ```python
@@ -88,7 +89,8 @@ for i in range(100):
     x = x-0.05*(2*x-4)
 ```
 
-4. probability <br/>
+4. probability 
+
 10 keys, only 3 of them can open the door. Pick 2, and calculate the probability to open the door.
 ```
 7*6 / (10*9) = 7/15
@@ -96,7 +98,8 @@ for i in range(100):
 ```
 
 
-5. Deep Learning <br/>
+5. Deep Learning
+
 **CNN** <br/>
 - Several examples about Kernel, filters
 - how kernel function works
@@ -114,11 +117,74 @@ for i in range(100):
 - Assume I know nothing about machine learning, tell me about the model you are most familiar with.
 - How to use gradient descent to update the parameter
 - Softmax
+- Gradient Descent: after active function mapping, how to deal with the points which don't have gradent descent
+
 
 7. OCR <br/>
 - Pipeline: image preprocessing
 - DL Architecture
 - https://zhuanlan.zhihu.com/p/42719047
+
+8. Others
+- Tell me something about time series
+- n-gram model
+- Intern project
+- Visualization tools
+
+9. coding
+
+```python
+# TODO 1: count elements in a list
+def count_(List):
+    answer = {}
+    for element in List:
+        if element in answer.keys():
+            answer[element] += 1
+        else:
+            answer[element] = 1
+    return answer
+
+def count_(List):
+    answer = {}
+    for element in List:
+        try:
+            answer[element] += 1
+        except:
+            answer[element] = 1
+    return answer
+
+# TODO 2: stratified sampling, input: [{'value': 1.2, 'type': 'type1'}, {}, {}]
+def stratified_samping(List, ratio):
+    length = len(List)
+    numpy.random.shuffle(List)
+    count_ = {}
+    result =  []
+    value_ = defaultdict(list)
+    for element in List:
+        try:
+            count_[element['type']] += 1
+        except:
+            count_[element['type']] = 1
+        value_[element['type']].append(element['value'])
+    keys = list(count_.keys())
+    for key in keys:
+        bound = int(count_[key]*ratio)
+        result += value_[key][:bound]
+    return result
+
+# TODO 3: Modify corresponding value to 0 in a 2d-array, if i+j > x
+def solution(Array, val, target):
+    shape = Array.shape
+    ind = numpy.array([False]*(shape[0]*shape[1]))
+    ind.shape = shape
+    for i in range(shape[0]):
+        for j in range(shape[1]):
+            if i+j > val:
+                ind[i][j] = True
+    Array[ind] = target
+    return Array
+
+```
 
 
 

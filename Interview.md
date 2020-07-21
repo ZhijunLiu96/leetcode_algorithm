@@ -186,6 +186,31 @@ def solution(Array, val, target):
 
 ```
 
+10. [coding](https://github.com/ZhijunLiu96/leetcode_algorithm/blob/master/is_in_convexhull.ipynb)
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+def is_in_convexhull(points,newpoint):
+    points.insert(0,points[-1])
+    points.append(points[1])
+    for i in range(1,len(points)-1):
+        vector1 = np.array(points[i-1]) - np.array(points[i])
+        vector2 = np.array(points[i+1]) - np.array(points[i])
+        vector3 = np.array(newpoint) - np.array(points[i])
+        angle1 = np.angle(complex(vector1[0],vector1[1]),deg=True) if np.angle(complex(vector1[0],vector1[1]),deg=True)>=0 else 360+np.angle(complex(vector1[0],vector1[1]),deg=True)
+        angle2 = np.angle(complex(vector2[0],vector2[1]),deg=True) if np.angle(complex(vector2[0],vector2[1]),deg=True)>=0 else 360+np.angle(complex(vector2[0],vector2[1]),deg=True)
+        angle3 = np.angle(complex(vector3[0],vector3[1]),deg=True) if np.angle(complex(vector3[0],vector3[1]),deg=True)>=0 else 360+np.angle(complex(vector3[0],vector3[1]),deg=True)
+        mini = min(angle1, angle2)
+        maxi = max(angle1, angle2)
+        if maxi-mini > 180:
+             if mini <= angle3 <= maxi:
+                 return False
+        else:
+            if angle3 >= maxi or angle3 <= mini:
+                return False
+    return True
+```
 
 
 

@@ -795,7 +795,19 @@ WHERE Id IN (SELECT * FROM manager)
 
 1501. Countries You Can Safely Invest In
 ```sql
-
+SELECT Country_name country 
+FROM  ((SELECT c.name Country_Name, cl1.duration
+        FROM Country c
+        JOIN Person p ON c.country_code = LEFT(p.phone_number,3)
+        JOIN Calls cl1 ON cl1.caller_id = p.id)
+    UNION ALL
+        (SELECT c.name Country_Name, cl1.duration
+        FROM Country c
+        JOIN Person p ON c.country_code = LEFT(p.phone_number,3)
+        JOIN Calls cl1 ON cl1.callee_id = p.id)
+        ) t1
+GROUP BY Country_name
+HAVING AVG(duration) > (SELECT AVG(duration) FROM calls)
 ```
 
 626. Exchange Seats
@@ -961,7 +973,17 @@ From Scores;
 
 550. Game Play Analysis IV
 ```sql
-
+WITH firstday AS (
+    SELECT player_id, MIN(event_date) event_date
+    FROM Activity
+    GROUP BY player_id), 
+     loggin AS(
+    SELECT  a.player_id
+    FROM firstday a, Activity b
+    WHERE a.player_id = b.player_id 
+        AND a.event_date = DATE_ADD(b.event_date, INTERVAL -1 DAY)
+    GROUP BY a.player_id)
+SELECT ROUND((SELECT COUNT( player_id) FROM loggin)/ (SELECT COUNT(DISTINCT player_id) FROM Activity),2) fraction
 ```
 
 1107. New Users Daily Count
